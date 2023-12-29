@@ -21,23 +21,23 @@
 - Uber는 정확한 도착 시간 예측(Estimating Travel Time, ETA)을 통해 뛰어난 고객 경험을 제공하려고 노력하고 있습니다. 이를 위해 우버는 도로 네트워크를 그래프로 나타내어 최단 경로 알고리즘을 사용해 도착 예정 시간을 계산했으나, 도로의 실제 상태를 완벽하게 반영하지 못했다는 한계가 있습니다.
 
     ![https://blog.uber-cdn.com/cdn-cgi/image/width=2160,quality=80,onerror=redirect,format=auto/wp-content/uploads/2022/08/figure1-1.png](https://blog.uber-cdn.com/cdn-cgi/image/width=2160,quality=80,onerror=redirect,format=auto/wp-content/uploads/2022/08/figure1-1.png)
-    - 캡션
+    - 그림 1 Hybrid approach of ETA post-processing using ML models (우버 블로그)
 
     
 - 우버의 도착 시간을 통해 요금 계산, 픽업 시간 예측, 라이더-드라이버간 매칭, 배달시간 계획 등에 사용하기에 이를 활용하는 것은 중요한 일입니다. 따라서 이러한 한계를 개선하기 위해 도로 그래프와 실시간 지리 데이터를 결합하고, 지연(Latency), 정확도(Accuracy), 일반화(Generality)를 개선하기 위해 딥러닝 모델을 활용했습니다.
 
     ![그림 0 내용 (우버 블로그)](https://blog.uber-cdn.com/cdn-cgi/image/width=2160,quality=80,onerror=redirect,format=auto/wp-content/uploads/2022/08/figure2-3.png)
-    - 그림 0 내용 (우버 블로그)
+    - 그림 2 An overview of the DeepETA model pipeline (우버 블로그)
 
 - 우버는 총 7가지의 신경망 아키텍쳐를 테스트 했습니다. 그 중 self-attention을 갖춘 인코더-디코더 아키텍처가 최고의 정확도를 보였습니다. 또한, 모든 입력을 모델에 분리하고 삽입하면 정확도가 상당히 향상될 수 있다는 것을 발견했습니다. Self-attention은 각 기능 간의 쌍별 상호 작용을 찾아내어 각 기능의 표현을 모든 기능의 가중 합계로 출력합니다. 이를 통해 모든 시간적, 공간적 특징을 현재 처리 중인 하나의 특징으로 집중할 수 있습니다 (아래 설명).
    
     ![https://blog.uber-cdn.com/cdn-cgi/image/width=2160,quality=80,onerror=redirect,format=auto/wp-content/uploads/2022/08/figure3-4.png](https://blog.uber-cdn.com/cdn-cgi/image/width=2160,quality=80,onerror=redirect,format=auto/wp-content/uploads/2022/08/figure3-4.png)
-    - 캡션 
+    - 그림 3 Attention matrix in self-attention (우버 블로그)
     
 - 하지만, self-attention을 갖춘 딥러닝 아키텍쳐는 정확도가 높지만 실제 운용할 수 있는 속도가 느리다는 한계를 가지고 있습니다. 우버는 Linear Transformer를 사용하여 이 복잡도를 줄이고 처리 속도를 높였습니다. 이를 통해 우버는 Transformer 기반 인코더의 높은 정확도와 빠른 지연 시간을 결합하여 실시간 서비스에 적합하게 만드는 방법을 적용했습니다.
     
     ![https://blog.uber-cdn.com/cdn-cgi/image/width=2160,quality=80,onerror=redirect,format=auto/wp-content/uploads/2022/08/figure6.png](https://blog.uber-cdn.com/cdn-cgi/image/width=2160,quality=80,onerror=redirect,format=auto/wp-content/uploads/2022/08/figure6.png)
-    - 캡션
+    - 그림 4 Illustration of the DeepETA model structure (우버 블로그)
     
 - 추가적으로, 우버는 전 세계 모든 사업 부문에 서비스를 제공하는 일반 ETA 모델을 목표로 하고 있습니다. 이를 달성하기 위해 Bias Adjustment Decoder와 Asymmetric Huber Loss을 사용했습니다. 먼저, Bias Adjustment Decoder를 통해 다양한 여행 유형과 지역에 대한 예측을 최적화하고, Asymmetric Huber Loss을 사용하여 다양한 비즈니스 사용 사례와 이상치 비율을 수용합니다. 이러한 기술은 모델을 전 세계 Uber의 모든 사업 부문에 적용할 수 있도록 일반화하는 데 중요합니다.
 
